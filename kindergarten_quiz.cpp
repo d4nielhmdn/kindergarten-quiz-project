@@ -2,111 +2,128 @@
 // SECTION 6: INTERACTIVE C++ PROGRAM
 // Group Members: Den (Lead & Git), Danial (Logic), Kenneth (UI/Content)
 
-// ===== DEN'S TASK: SETUP & INTEGRATION =====
-// TODO DEN: Include any necessary libraries here.
 #include <iostream>
 #include <string>
 using namespace std;
 
-// ===== FUNCTION DECLARATIONS (The "Table of Contents") =====
-// TODO KENNETH: Write these functions to handle user interaction.
-void displayWelcomeMessage();
-string askQuestion(string letter);
-void displayResult(bool isCorrect);
-void displayGoodbyeMessage();
+// ===== FUNCTION DECLARATIONS (KENNETH) =====
+void displayWelcomeMessage();                           // KENNETH
+string askQuestion(string letter, string options[4]);    // KENNETH
+void displayResult(bool isCorrect);                      // KENNETH
+void displayGoodbyeMessage();                            // KENNETH
 
-// TODO DANIAL: Write this function to handle the core logic.
-bool checkAnswer(string userAnswer, string correctAnswer);
+// ===== FUNCTION DECLARATIONS (DANIAL) =====
+bool checkAnswer(string userAnswer, string correctOption); // DANIAL
 
-// ===== DEN'S TASK: MAIN PROGRAM CONTROLLER =====
+// ===== MAIN PROGRAM CONTROLLER (DEN) =====
 int main()
 {
-    // TODO DEN:
-    // 1. Initialize arrays for quiz data (letters and answers).
-    string letters[] = {"A", "B", "C", "D", "E"};
-    string answers[] = {"Apple", "Ball", "Cat", "Dog", "Elephant"};
+    // ===== QUIZ DATA (DEN) =====
+    string letters[] = {"A", "B", "C", "D", "E"}; // DEN sets up letters
 
-    int totalQuestions = 5; // Size of the arrays
-    int score = 0;          // Variable to track correct answers
+    // KENNETH: Provides the content for the options
+    string options[5][4] = {
+        {"Apple", "Ball", "Cat", "Dog"},       // Correct: A
+        {"Ant", "Ball", "Cup", "Duck"},        // Correct: B
+        {"Fish", "Banana", "Cat", "Egg"},      // Correct: C
+        {"Dog", "Apple", "Elephant", "Fan"},   // Correct: D
+        {"Car", "Fish", "Eagle", "Banana"}     // Correct: E
+    };
 
-    // 2. Call Kenneth's function to show the welcome message.
+    // DANIAL: Correct answer keys for each question
+    string correctChoices[] = {"a", "b", "c", "a", "c"};
+
+    int totalQuestions = 5; // DEN
+    int score = 0;          // DEN tracks the score
+
+    // KENNETH: Welcome message
     displayWelcomeMessage();
 
-    // 3. Loop through all the questions.
+    // DEN: Controls quiz loop
     for (int i = 0; i < totalQuestions; i++)
     {
-        // a. Call Kenneth's function to ask a question and get an answer.
-        string userAnswer = askQuestion(letters[i]);
+        // KENNETH: Ask question and get user input
+        string userAnswer = askQuestion(letters[i], options[i]);
 
-        // b. Call Danial's function to check if the answer is correct.
-        bool isCorrect = checkAnswer(userAnswer, answers[i]);
+        // DANIAL: Check if answer is correct
+        bool isCorrect = checkAnswer(userAnswer, correctChoices[i]);
 
-        // c. Update the score if the answer was correct.
-        if (isCorrect)
-        {
-            score++;
-        }
+        // DEN: Update score
+        if (isCorrect) score++;
 
-        // d. Call Kenneth's function to show the result.
+        // KENNETH: Display result
         displayResult(isCorrect);
     }
 
-    // 4. After the loop, show the final score.
-    // TODO DEN & KENNETH: Collaborate on this output.
-    cout << "Quiz over! Your final score is: " << score << "/" << totalQuestions << endl;
+    // DEN & KENNETH: Final score output
+    cout << "\nQuiz over! Your final score is: " << score << "/" << totalQuestions << endl;
 
-    // 5. Call Kenneth's function to show the goodbye message.
+    // KENNETH: Goodbye message
     displayGoodbyeMessage();
 
     return 0;
 }
 
-// ===== KENNETH'S TASKS: USER INTERFACE & CONTENT =====
-// TODO KENNETH: Write the definitions for these functions.
-// Make the output friendly and engaging for children.
-
+// ===== USER INTERFACE & CONTENT (KENNETH) =====
 void displayWelcomeMessage()
 {
-    // Example:
-    // cout << "🌈 Welcome to the Fun Alphabet Quiz! 🌈" << endl;
-    // cout << "Let's see what words you know!" << endl;
+    cout << "\n🌈 Welcome to the Fun Alphabet Quiz! 🌈" << endl;
+    cout << "Choose the correct option by typing A, B, C, or D." << endl;
+    cout << "Let's begin!\n" << endl;
 }
 
-string askQuestion(string letter)
+string askQuestion(string letter, string options[4])
 {
     string answer;
-    // Example:
-    // cout << "What word starts with the letter " << letter << "? ";
-    // cin >> answer;
+    cout << "Which of these starts with '" << letter << "'?\n";
+    cout << "A) " << options[0] << "\n";
+    cout << "B) " << options[1] << "\n";
+    cout << "C) " << options[2] << "\n";
+    cout << "D) " << options[3] << "\n";
+    cout << "Your choice (A/B/C/D): ";
+    cin >> answer;
     return answer;
 }
 
 void displayResult(bool isCorrect)
 {
-    // Example if true:
-    // cout << "✅ Correct! You're so smart!" << endl;
-    // Example if false:
-    // cout << "❌ Oops! Nice try! Let's do the next one." << endl;
+    if (isCorrect)
+        cout << "✅ Correct! Great job!\n" << endl;
+    else
+        cout << "❌ Oops! Try the next one!\n" << endl;
 }
 
 void displayGoodbyeMessage()
 {
-    // Example:
-    // cout << "Thanks for playing! You did great!" << endl;
+    cout << "🎉 Thanks for playing! See you next time! 👋" << endl;
 }
 
-// ===== DANIAL'S TASKS: CORE PROGRAM LOGIC =====
-// TODO DANIAL: Write the definition for this function.
-// This function should compare the user's answer to the correct answer.
-// Make it robust (e.g., not case-sensitive).
-
-bool checkAnswer(string userAnswer, string correctAnswer)
+// ===== CORE LOGIC (DANIAL) =====
+bool checkAnswer(string userAnswer, string correctOption)
 {
-    // Step 1: Convert both userAnswer and correctAnswer to the same case (e.g., lowercase).
-    // This way, "Apple" and "apple" are both correct.
+    // Helper lambda to trim spaces
+    auto trim = [](string &str) {
+        str.erase(0, str.find_first_not_of(" \t\n\r"));
+        str.erase(str.find_last_not_of(" \t\n\r") + 1);
+    };
 
-    // Step 2: Compare the converted strings.
+    // Trim inputs
+    trim(userAnswer);
+    trim(correctOption);
 
-    // Step 3: Return true if they match, false if they don't.
-    return false; // Delete this line when you write your logic.
+    if (userAnswer.empty()) return false;
+
+    // Convert both to lowercase
+    for (char &c : userAnswer) c = tolower(c);
+    for (char &c : correctOption) c = tolower(c);
+
+    // Validate input is one of a,b,c,d
+    if (userAnswer != "a" && userAnswer != "b" &&
+        userAnswer != "c" && userAnswer != "d") {
+        cout << "⚠️ Please choose only A, B, C, or D!\n";
+        return false;
+    }
+
+    // Check if the choice matches
+    return userAnswer == correctOption;
 }
