@@ -4,6 +4,9 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
+#include <chrono>
+
 using namespace std;
 
 // ===== FUNCTION DECLARATIONS (KENNETH) =====
@@ -11,6 +14,14 @@ void displayWelcomeMessage();                           // KENNETH
 string askQuestion(string letter, string options[4]);    // KENNETH
 void displayResult(bool isCorrect);                      // KENNETH
 void displayGoodbyeMessage();                            // KENNETH
+
+void typeText(const string &text, int delay = 40) { // delay in ms per character
+    for (char c : text) {
+        cout << c << flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+    }
+    cout << endl;
+}
 
 // ===== FUNCTION DECLARATIONS (DANIAL) =====
 bool checkAnswer(string userAnswer, string correctOption); // DANIAL
@@ -67,20 +78,20 @@ int main()
 // ===== USER INTERFACE & CONTENT (KENNETH) =====
 void displayWelcomeMessage()
 {
-    cout << "\n🌈 Welcome to the Fun Alphabet Quiz! 🌈" << endl;
-    cout << "Choose the correct option by typing A, B, C, or D." << endl;
-    cout << "Let's begin!\n" << endl;
+    typeText("\n🌈 Welcome to the Fun Alphabet Quiz! 🌈");
+    typeText("Choose the correct option by typing A, B, C, or D.");
+    typeText("Let's begin!\n");
 }
 
 string askQuestion(string letter, string options[4])
 {
     string answer;
-    cout << "Which of these starts with '" << letter << "'?\n";
-    cout << "A) " << options[0] << "\n";
-    cout << "B) " << options[1] << "\n";
-    cout << "C) " << options[2] << "\n";
-    cout << "D) " << options[3] << "\n";
-    cout << "Your choice (A/B/C/D): ";
+    typeText("Which of these starts with '" + letter + "'?");
+    typeText("A) " + options[0]);
+    typeText("B) " + options[1]);
+    typeText("C) " + options[2]);
+    typeText("D) " + options[3]);
+    typeText ( "Your choice ( A / B / C / D ): ", 40);
     cin >> answer;
     return answer;
 }
@@ -88,9 +99,9 @@ string askQuestion(string letter, string options[4])
 void displayResult(bool isCorrect)
 {
     if (isCorrect)
-        cout << "✅ Correct! Great job!\n" << endl;
+        typeText("✅ Correct! Great job!\n");
     else
-        cout << "❌ Oops! Try the next one!\n" << endl;
+        typeText("❌ Oops! Try the next one!\n");
 }
 
 void displayGoodbyeMessage()
