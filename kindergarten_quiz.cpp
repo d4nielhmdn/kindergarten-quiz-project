@@ -5,9 +5,28 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <vector>      // For flexible lists of words
+#include <random>      // For modern, high-quality randomness
+#include <algorithm>   // To shuffle the words
 #include <chrono>
 
 using namespace std;
+
+struct Word {
+    string text;
+    char startingLetter;
+};
+
+// The main list of all possible words for the quiz.
+// Kenneth can easily add more words here!
+vector<Word> wordBank = {
+    {"Apple", 'A'}, {"Ant", 'A'}, {"Alligator", 'A'}, {"Airplane", 'A'},
+    {"Ball", 'B'}, {"Banana", 'B'}, {"Bird", 'B'}, {"Boat", 'B'},
+    {"Cat", 'C'}, {"Car", 'C'}, {"Cup", 'C'}, {"Cow", 'C'},
+    {"Dog", 'D'}, {"Duck", 'D'}, {"Dolphin", 'D'}, {"Desk", 'D'},
+    {"Eagle", 'E'}, {"Egg", 'E'}, {"Elephant", 'E'}, {"Ear", 'E'},
+    {"Fish", 'F'}, {"Fan", 'F'}, {"Frog", 'F'}
+};
 
 // ===== FUNCTION DECLARATIONS (KENNETH) =====
 void displayWelcomeMessage();                           // KENNETH
@@ -29,20 +48,12 @@ bool checkAnswer(string userAnswer, string correctOption); // DANIAL
 // ===== MAIN PROGRAM CONTROLLER (DEN) =====
 int main()
 {
+    // [ADDED] Setup for the high-quality random number generator.
+    std::random_device rd;
+    std::mt19937 generator(rd());
+
     // ===== QUIZ DATA (DEN) =====
     string letters[] = {"A", "B", "C", "D", "E"}; // DEN sets up letters
-
-    // KENNETH: Provides the content for the options
-    string options[5][4] = {
-        {"Apple", "Ball", "Cat", "Dog"},       // Correct: A
-        {"Ant", "Ball", "Cup", "Duck"},        // Correct: B
-        {"Fish", "Banana", "Cat", "Egg"},      // Correct: C
-        {"Dog", "Apple", "Elephant", "Fan"},   // Correct: D
-        {"Car", "Fish", "Eagle", "Banana"}     // Correct: E
-    };
-
-    // DANIAL: Correct answer keys for each question
-    string correctChoices[] = {"a", "b", "c", "a", "c"};
 
     int totalQuestions = 5; // DEN
     int score = 0;          // DEN tracks the score
@@ -53,11 +64,57 @@ int main()
     // DEN: Controls quiz loop
     for (int i = 0; i < totalQuestions; i++)
     {
-        // KENNETH: Ask question and get user input
-        string userAnswer = askQuestion(letters[i], options[i]);
+        // [CHANGE 2] The core logic inside the loop is replaced with this dynamic version.
+        // === START OF NEW DYNAMIC QUESTION LOGIC ===
+        char currentLetter = letters[i][0];
 
-        // DANIAL: Check if answer is correct
-        bool isCorrect = checkAnswer(userAnswer, correctChoices[i]);
+        // 1. Create separate lists for correct words and incorrect "distractors".
+        vector<Word> possibleCorrectWords;
+        vector<Word> possibleDistractors;
+        for (const auto& word : wordBank) {
+            if (word.startingLetter == currentLetter) {
+                possibleCorrectWords.push_back(word);
+            } else {
+                possibleDistractors.push_back(word);
+            }
+        }
+
+        // Safety Check
+        if (possibleCorrectWords.empty() || possibleDistractors.size() < 3) {
+            cout << "Error: Not enough words in bank for letter '" << currentLetter << "'!" << endl;
+            continue;
+        }
+
+        // 2. Pick ONE random correct word.
+        std::shuffle(possibleCorrectWords.begin(), possibleCorrectWords.end(), generator);
+        string theCorrectWord = possibleCorrectWords[0].text;
+
+        // 3. Pick THREE random incorrect words.
+        std::shuffle(possibleDistractors.begin(), possibleDistractors.end(), generator);
+        string options[4] = {
+            theCorrectWord,
+            possibleDistractors[0].text,
+            possibleDistractors[1].text,
+            possibleDistractors[2].text
+        };
+
+        // 4. Shuffle the final options to randomize the answer position.
+        std::shuffle(options, options + 4, generator);
+
+        // 5. Find where the correct answer landed and store its choice ('a', 'b', etc.).
+        string correctChoice;
+        for (int j = 0; j < 4; j++) {
+            if (options[j] == theCorrectWord) {
+                correctChoice = 'a' + j;
+                break;
+            }
+        }
+
+        // KENNETH: Ask question (this part stays the same, but uses the new dynamic `options`)
+        string userAnswer = askQuestion(letters[i], options);
+
+        // DANIAL: Check answer (this part stays the same, but uses the new dynamic `correctChoice`)
+        bool isCorrect = checkAnswer(userAnswer, correctChoice);
 
         // DEN: Update score
         if (isCorrect) score++;
@@ -91,8 +148,9 @@ string askQuestion(string letter, string options[4])
     typeText("B) " + options[1]);
     typeText("C) " + options[2]);
     typeText("D) " + options[3]);
-    typeText ( "Your choice ( A / B / C / D ): ", 40);
+    typeText ( "Your choice ( A / B / C / D ): ");
     cin >> answer;
+    cout << endl;
     return answer;
 }
 
